@@ -17,3 +17,11 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+tesis = [
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.10.0",
+    "notebook>=7.3.2",
+    "pandas>=2.2.3",
+]

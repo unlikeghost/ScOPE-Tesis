@@ -1,6 +1,6 @@
 import ot
 import numpy as np
-from typing import Dict
+from typing import Dict, Any
 
 from scope.models.base_model import BaseModel
 
@@ -50,9 +50,17 @@ class ScOPEOT(BaseModel):
             )
         )
 
-        scores: Dict[str, float] = {
-            cluster_key[len(self.start_key_value_matrix):]: 0.0
-            for cluster_key in cluster_keys
+        # scores: Dict[str, float] = {
+        #     cluster_key[len(self.start_key_value_matrix):]: 0.0
+        #     for cluster_key in cluster_keys
+        # }
+
+        output: Dict[str, Any] = {
+            'scores': {
+                cluster_key[len(self.start_key_value_matrix):]: 0.0
+                for cluster_key in cluster_keys
+            },
+            'predicted_class': None
         }
 
         for cluster_key in cluster_keys:
@@ -89,20 +97,37 @@ class ScOPEOT(BaseModel):
                 sample_weights=current_sample_weights,
             )
 
-            scores[real_cluster_name] = score
+            output['scores'][real_cluster_name] = score
 
-        return scores
+        if softmax:
+            score_values: list = list(output['scores'].values())
+            # compute reciprocal distances:
+            similarity_scores = 1 / (
+                    np.array(score_values) + 1e-6)
+
+            softmax_scores: np.ndarray = self.__softmax__(np.array(similarity_scores))
+
+            output['softmax'] = {
+                cluster_key[len(self.start_key_value_matrix):]: float(softmax_value)
+                for cluster_key, softmax_value in zip(cluster_keys, softmax_scores)
+            }
+
+            output['predicted_class'] = cluster_keys[np.argmax(softmax_scores)].replace('ScOPEC_', '')
+
+        output['predicted_class'] = output['predicted_class'] if output['predicted_class'] else cluster_keys[np.argmax(np.argmin(list(output['scores'].values())))].replace('ScOPEC_', '')
+
+        return output
 
 
 if __name__ == '__main__':
-    from scope.compressors import LZ77Compressor as Compressor
+    from scope.compressors import GZIPCompressor as Compressor
     from scope.matrix import MatrixFactory
 
     test_kw_samples: dict = {
         'class_0': ['Hola', 'Hola!', 'Holaa'],
         'class_1': ['Adios', 'Adios!', 'Adioss']
     }
-    test_sample: str = 'holliiiiiiiiiii!'
+    test_sample: str = 'Adios'
     matrix_factory: MatrixFactory = MatrixFactory(
         compressor_module=Compressor(),
         name_distance_function='ncd',
@@ -111,4 +136,4 @@ if __name__ == '__main__':
     matrix_result: Dict[str, np.ndarray] = matrix_factory(test_sample, test_kw_samples, get_best_sigma=True)
 
     model = ScOPEOT(use_matching_method=True)
-    print(model.forward(matrix_result))
+    print(model.forward(matrix_result, softmax=True))

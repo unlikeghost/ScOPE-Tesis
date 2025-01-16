@@ -17,8 +17,7 @@ class BaseModel:
 
     @staticmethod
     def __softmax__(scores: np.ndarray) -> np.ndarray:
-        new_scores: np.ndarray = 1 / (1 + scores)
-        return np.exp(new_scores)/sum(np.exp(new_scores))
+        return np.exp(scores)/sum(np.exp(scores))
 
     @staticmethod
     def __gaussian_function__(x: np.ndarray, sigma: Union[np.ndarray, float]) -> np.ndarray:

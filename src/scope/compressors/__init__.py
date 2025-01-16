@@ -5,7 +5,7 @@ from .base_compressor import BaseCompressor
 
 
 __all__ = [
-    'LZ77Compressor'
+    'LZ77Compressor',
     'GZIPCompressor',
     'BZ2Compressor',
     'BaseCompressor'
