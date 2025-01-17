@@ -120,20 +120,20 @@ class ScOPEOT(BaseModel):
 
 
 if __name__ == '__main__':
-    from scope.compressors import GZIPCompressor as Compressor
+    from scope.compressors import ZStandardCompressor as Compressor
     from scope.matrix import MatrixFactory
 
     test_kw_samples: dict = {
         'class_0': ['Hola', 'Hola!', 'Holaa'],
         'class_1': ['Adios', 'Adios!', 'Adioss']
     }
-    test_sample: str = 'Adios'
+    test_sample: str = 'Hola'
     matrix_factory: MatrixFactory = MatrixFactory(
         compressor_module=Compressor(),
         name_distance_function='ncd',
         str_separator='\t'
     )
-    matrix_result: Dict[str, np.ndarray] = matrix_factory(test_sample, test_kw_samples, get_best_sigma=True)
+    matrix_result: Dict[str, np.ndarray] = matrix_factory(test_sample, test_kw_samples, get_best_sigma=False)
 
-    model = ScOPEOT(use_matching_method=True)
+    model = ScOPEOT(use_matching_method=False)
     print(model.forward(matrix_result, softmax=True))

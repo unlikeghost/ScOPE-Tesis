@@ -3,7 +3,7 @@ from sklearn.metrics import (roc_curve, roc_auc_score, accuracy_score,
                              confusion_matrix)
 
 
-def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_auc: np.ndarray) -> dict:
+def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarray) -> dict:
     """
         Generates a performance report for classification results, including ROC-related
         metrics and confusion matrix evaluation.
@@ -18,7 +18,7 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_auc: np.ndarray) 
                 True class labels of the dataset.
             y_pred: np.ndarray
                 Predicted class labels by a classifier.
-            y_pred_auc: np.ndarray
+            y_pred_softmax: np.ndarray
                 Predicted probabilities for the positive class, used for generating
                 the ROC curve.
 
@@ -32,8 +32,8 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_auc: np.ndarray) 
                 - 'acc': accuracy score of the predictions.
                 - 'confusion_matrix': confusion matrix of true vs predicted class labels.
     """
-    fpr, tpr, thresholds = roc_curve(y_true, np.array(y_pred_auc)[:, 1])
-    auc_roc = roc_auc_score(y_true, np.array(y_pred_auc)[:, 1])
+    fpr, tpr, thresholds = roc_curve(y_true, np.array(y_pred_softmax)[:, 1])
+    auc_roc = roc_auc_score(y_true, np.array(y_pred_softmax)[:, 1])
 
     this_data: dict = {
         'fpr': fpr,

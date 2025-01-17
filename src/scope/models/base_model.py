@@ -6,7 +6,6 @@ from scope.distances import MatchingMethods
 
 
 class BaseModel:
-
     start_key_value_matrix: str = 'ScOPEC_'
     start_key_value_sample: str = 'ScOPES_'
 
@@ -17,7 +16,8 @@ class BaseModel:
 
     @staticmethod
     def __softmax__(scores: np.ndarray) -> np.ndarray:
-        return np.exp(scores)/sum(np.exp(scores))
+        exp_scores = np.exp(scores - np.max(scores))  # **Softmax Stabilization**
+        return exp_scores / np.sum(exp_scores)
 
     @staticmethod
     def __gaussian_function__(x: np.ndarray, sigma: Union[np.ndarray, float]) -> np.ndarray:
