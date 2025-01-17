@@ -19,7 +19,7 @@ class MatrixFactoryV2(MatrixFactoryBase):
             shape=(
                 len(samples),
                 1,
-                len(samples) - 1
+                len(samples)
             ),
             dtype=np.float32
         )
@@ -28,13 +28,13 @@ class MatrixFactoryV2(MatrixFactoryBase):
 
             x1_len: np.ndarray = compression_lengths[index_i]
 
-            # keep samples that are different from current index
-            current_samples_index: list = list(
-                filter(lambda values: values[0] != index_i, enumerate(samples))
-            )
-            current_samples: list = [item for _, item in current_samples_index]
+            # # keep samples that are different from current index
+            # current_samples_index: list = list(
+            #     filter(lambda values: values[0] != index_i, enumerate(samples))
+            # )
+            # current_samples: list = [item for _, item in current_samples_index]
 
-            for index_j, current_sample in enumerate(current_samples):
+            for index_j, current_sample in enumerate(samples):
 
                 _, _, x2_len = self.compress_data(current_sample)
 
@@ -96,10 +96,10 @@ if __name__ == "__main__":
     from scope.compressors import BZ2Compressor as Compressor
 
     test_kw_samples: dict = {
-        'class_0': ['Holi', 'Hola!', 'Holaa'],
+        'class_0': ['Hola', 'Hola!', 'Holaa'],
         'class_1': ['Adios', 'Adios!', 'Adioss']
     }
-    test_sample: str = 'Hola'
+    test_sample: str = 'Holi'
 
     factory = MatrixFactoryV2(
         compressor_module=Compressor(),
