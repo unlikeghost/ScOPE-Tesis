@@ -121,14 +121,15 @@ class ScOPEOT(BaseModel):
 
 
 if __name__ == '__main__':
-    from scope.compressors import ZStandardCompressor as Compressor
-    from scope.matrix import MatrixFactory
+    from scope.compressors import BZ2Compressor as Compressor
+    from scope.matrix import MatrixFactoryV2 as MatrixFactory
 
     test_kw_samples: dict = {
         'class_0': ['Hola', 'Hola!', 'Holaa'],
         'class_1': ['Adios', 'Adios!', 'Adioss']
     }
-    test_sample: str = 'Hola'
+    test_sample: str = 'Holi'
+
     matrix_factory: MatrixFactory = MatrixFactory(
         compressor_module=Compressor(),
         name_distance_function='ncd',
