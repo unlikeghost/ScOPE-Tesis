@@ -12,6 +12,8 @@ class ScOPEOT(BaseModel):
 
         self.cost_matrix_function: callable = self.__calc_cost_ot_matrix if not use_matching_method else self.__calc_cost_matching_matrix
 
+        self.epsilon: float = 1e-12
+
     @staticmethod
     def __calc_cost_ot_matrix(sample: np.ndarray, kw_samples: np.ndarray) -> np.ndarray:
         cost_matrix: np.ndarray = ot.dist(kw_samples, sample, metric='euclidean')
@@ -102,8 +104,7 @@ class ScOPEOT(BaseModel):
         if softmax:
             score_values: list = list(output['scores'].values())
             # compute reciprocal distances:
-            similarity_scores = 1 / (
-                    np.array(score_values) + 1e-6)
+            similarity_scores = 1 / (np.array(score_values) + self.epsilon)
 
             softmax_scores: np.ndarray = self.__softmax__(np.array(similarity_scores))
 
@@ -131,9 +132,9 @@ if __name__ == '__main__':
     matrix_factory: MatrixFactory = MatrixFactory(
         compressor_module=Compressor(),
         name_distance_function='ncd',
-        str_separator='\t'
+        str_separator=' '
     )
-    matrix_result: Dict[str, np.ndarray] = matrix_factory(test_sample, test_kw_samples, get_best_sigma=False)
+    matrix_result: Dict[str, np.ndarray] = matrix_factory(test_sample, test_kw_samples, get_best_sigma=True)
 
-    model = ScOPEOT(use_matching_method=False)
+    model = ScOPEOT(use_matching_method=True)
     print(model.forward(matrix_result, softmax=True))
