@@ -10,6 +10,8 @@ numpy==2.2.5
     #   pot
     #   scikit-learn
     #   scipy
+pillow==11.2.1
+    # via scope (pyproject.toml)
 pot==0.9.5
     # via scope (pyproject.toml)
 scikit-learn==1.6.1
