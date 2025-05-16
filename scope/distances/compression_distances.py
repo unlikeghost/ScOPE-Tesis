@@ -159,5 +159,5 @@ if __name__ == '__main__':
     _, _, test_x1x2 = compressor("Hola Hola")
 
     compression_distance = CompressionDistance()
-    result = compression_distance(distance="nid", x1=test_x1, x2=test_x2, x1x2=test_x1x2)
+    result = compression_distance(distance="ncd", x1=test_x1, x2=test_x2, x1x2=test_x1x2)
     print(result)
