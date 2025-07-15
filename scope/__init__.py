@@ -1,2 +1,5 @@
-def hello() -> str:
-    return "Hello from scope!"
+from .model import ScOPE
+
+__all__ = [
+    "ScOPE"
+]

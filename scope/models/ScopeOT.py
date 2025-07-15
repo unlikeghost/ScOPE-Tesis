@@ -122,7 +122,7 @@ class ScOPEOT(BaseModel):
 
 if __name__ == '__main__':
     from scope.compressors import BZ2Compressor as Compressor
-    from scope.matrix import MatrixFactoryV2 as MatrixFactory
+    from scope.matrix import MatrixFactory as MatrixFactory
 
     test_kw_samples: dict = {
         'class_0': ['Hola', 'Hola!', 'Holaa'],
