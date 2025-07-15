@@ -44,3 +44,6 @@ Thumbs.db
 
 # UV
 uv.lock
+
+# Ignore notebook outputs but track code
+*.ipynb filter=nbstripout
