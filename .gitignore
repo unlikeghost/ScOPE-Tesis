@@ -27,3 +27,5 @@ out/
 
 # UV
 uv.lock
+
+results/
