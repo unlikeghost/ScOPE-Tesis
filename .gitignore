@@ -8,10 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
-env/
-venv/
-ENV/
-.local/share/virtualenvs/
 
 # JetBrains IDE specific files
 .idea/
@@ -22,10 +18,6 @@ out/
 *.so
 *.pyd
 
-# Testing output files
-.coverage
-.hypothesis/
-
 # Logs and temporary files
 *.log
 *.tmp
@@ -33,17 +25,5 @@ out/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-# System-specific files
-.DS_Store
-Thumbs.db
-
-# User-specific machine files
-*.swp
-*.swo
-*.swn
-
 # UV
 uv.lock
-
-# Ignore notebook outputs but track code
-*.ipynb filter=nbstripout
