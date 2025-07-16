@@ -143,6 +143,8 @@ def optimize_scope_model(X_validation: List[str],
     print(f"Best score: {study.best_value:.4f}")
     print("Best parameters:")
     for param, value in study.best_params.items():
+        if param == 'str_separator':
+            value = repr(value)
         print(f"  {param}: {value}")
     
     # Evaluate on holdout set if available
