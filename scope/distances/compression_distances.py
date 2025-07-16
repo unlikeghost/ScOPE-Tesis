@@ -108,6 +108,29 @@ class CompressionDistance:
         denominator: float = x1x2
         numerator: float = 1 - (x1 + x2 - x1x2)
         return numerator / denominator
+    
+    @staticmethod
+    def mse(x1: float, x2: float, x1x2: float) -> float:
+        """
+        Computes the Mean Squared Error (MSE) between two values.
+
+        This method calculates the squared difference between two numerical values
+        and returns the average of these squared differences. It is often used to
+        measure the accuracy of predictions in regression tasks.
+
+        Args:
+            x1: float
+                The first value for comparison.
+            x2: float
+                The second value for comparison.
+            x1x2: float
+                The concatenated value of x1 and x2.
+
+        Returns:
+            float
+                The computed Mean Squared Error value.
+        """
+        return (x1 - x2) ** 2
 
     def __call__(self, distance: str, **kwargs) -> float:
         """
@@ -142,13 +165,13 @@ class CompressionDistance:
             'ncd': self.ncd,
             'cdm': self.cdm,
             'clm': self.clm,
+            'mse': self.mse
         }
 
         if distance not in allowed_methods:
             raise ValueError(f'Method "{distance}" is not allowed')
 
         return allowed_methods[distance](**kwargs)
-
 
 if __name__ == '__main__':
     from scope.compressors import LZ77Compressor as Compressor

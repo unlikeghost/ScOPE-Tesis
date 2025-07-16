@@ -25,7 +25,14 @@ class MatrixFactoryBase:
         self.name_distance_function: str = name_distance_function
         self.distance_module: CompressionDistance = CompressionDistance()
         self.compressor_module: BaseCompressor = compressor_module
-
+    
+    def __str__(self) -> str:
+        print(
+            f"Compressor: {self.compressor_module}\n"
+            f"Distance Function: {self.name_distance_function}\n"
+            f"Separator: {repr(self.join_str_separator)}\n"
+        )
+    
     def get_best_sigma(self, sample: str, *kw_samples: str) -> float:
         """
         Computes the average sigma for the provided data.

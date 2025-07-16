@@ -1,6 +1,5 @@
 
-from numpy.typing import NDArray
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Generator
 
 from scope.models import ScOPEOT
 from scope.compressors import get_compressor
@@ -30,13 +29,12 @@ class ScOPE:
         
         self.use_best_sigma = use_best_sigma
     
-    def __forward__(self, sample: str, kw_samples: Dict[str, str]) -> NDArray:        
+    def __forward__(self, sample: str, kw_samples: Dict[str, str]) -> Dict[str, float]:        
         matrix_result: dict = self.matrix_factory(sample, kw_samples, get_best_sigma=self.use_best_sigma)
         predictions: dict = self.model.forward(matrix_result, softmax=True)
-        print(predictions)
         return predictions['softmax']
     
-    def forward(self, list_samples: List[str], list_kw_samples: List[Dict[str, str]]):
+    def forward(self, list_samples: List[str], list_kw_samples: List[Dict[str, str]]) -> Generator[Dict[str, float], None, None]:
         for index, (sample, kw_samples) in enumerate(zip(list_samples, list_kw_samples)):
             prediction = self.__forward__(sample, kw_samples)
             yield prediction
@@ -46,7 +44,7 @@ class ScOPE:
                  list_kw_samples: Union[
                      List[Dict[str, str]],
                      Dict[str, str]]
-                     ):
+                     ) -> Generator[Dict[str, float], None, None]:
         
         if not isinstance(list_samples, list):
             list_samples = [list_samples]
