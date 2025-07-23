@@ -1,18 +1,13 @@
+
 import numpy as np
-from typing import Dict, Union
-from abc import abstractmethod
-
-from scope.distances import MatchingMethods
+from typing import Dict, Union, Any, List
+from abc import abstractmethod, ABC
 
 
-class BaseModel:
+
+class BaseModel(ABC):
     start_key_value_matrix: str = 'ScOPEC_'
     start_key_value_sample: str = 'ScOPES_'
-
-    matching_method: MatchingMethods = MatchingMethods()
-
-    def __matching_score__(self, x1: np.ndarray, x2: np.ndarray, method: str = 'matching') -> float:
-        return self.matching_method(method=method, x1=x1, x2=x2)
 
     @staticmethod
     def __softmax__(scores: np.ndarray) -> np.ndarray:
@@ -29,5 +24,98 @@ class BaseModel:
         )
 
     @abstractmethod
-    def forward(self, data_matrix: Dict[str, np.ndarray], softmax: bool = False) -> np.ndarray:
-        raise NotImplementedError
+    def __forward__(self, current_cluster: np.ndarray, current_sample: np.ndarray) -> float:
+        raise NotImplementedError("This method should be implemented in subclasses.")
+    
+    
+    def forward(self, list_of_data: List[Dict[str, np.ndarray]], softmax: bool = False) -> List[Dict[str, Any]]:
+
+        if not isinstance(list_of_data, list):
+            raise ValueError("Input should be a list of dictionaries containing data matrices.")
+        
+        if not list_of_data:
+            return []
+        
+        output: List[Dict[str, Any]] = []
+        
+        for data_matrix in list_of_data:
+            
+            cluster_keys: list = list(
+                filter(
+                    lambda x: x.startswith(self.start_key_value_matrix),
+                    data_matrix.keys()
+                )
+            )
+
+            sample_keys: list = list(
+                filter(
+                    lambda x: x.startswith(self.start_key_value_sample),
+                    data_matrix.keys()
+                )
+            )
+            
+            this_output: Dict[str, Any] = {
+                'scores': {
+                    cluster_key[len(self.start_key_value_matrix):]: 0.0
+                    for cluster_key in cluster_keys
+                },
+                'predicted_class': None
+            }
+            
+            for cluster_key in cluster_keys:
+                real_cluster_name: str = cluster_key[len(self.start_key_value_matrix):]
+                current_sample_key: str = list(
+                    filter(
+                        lambda x: x.endswith(real_cluster_name),
+                        sample_keys)
+                )[0]
+
+                current_cluster: np.ndarray = data_matrix[cluster_key]
+                current_sample: np.ndarray = data_matrix[current_sample_key]
+
+                if data_matrix.get("best_sigma"):
+                    current_cluster = self.__gaussian_function__(
+                        x=current_cluster,
+                        sigma=data_matrix["best_sigma"]
+                    )
+                    current_sample = self.__gaussian_function__(
+                        x=current_sample,
+                        sigma=data_matrix["best_sigma"]
+                    )
+
+                score = self.__forward__(
+                    current_cluster,
+                    current_sample
+                )
+                
+                this_output['scores'][real_cluster_name] = score
+
+            if softmax:
+                score_values: list = list(this_output['scores'].values())
+                # compute reciprocal distances:
+                similarity_scores = 1 / (np.array(score_values) + self.epsilon)
+
+                softmax_scores: np.ndarray = self.__softmax__(np.array(similarity_scores))
+
+                this_output['softmax'] = {
+                    cluster_key[len(self.start_key_value_matrix):]: float(np.squeeze(softmax_value))
+                    for cluster_key, softmax_value in zip(cluster_keys, softmax_scores)
+                }
+
+                this_output['predicted_class'] = cluster_keys[np.argmax(softmax_scores)].replace('ScOPEC_', '')
+
+            this_output['predicted_class'] = this_output['predicted_class'] if this_output['predicted_class'] else cluster_keys[np.argmax(np.argmin(list(this_output['scores'].values())))].replace('ScOPEC_', '')
+
+            output.append(this_output)
+            
+        return output
+
+    def __call__(self, list_of_data: Union[List[Dict[str, np.ndarray]], Dict[str, np.ndarray]], softmax: bool = False) -> List[Dict[str, Any]]:
+
+        if not list_of_data:
+            return []
+
+        if isinstance(list_of_data, dict):
+            list_of_data = [list_of_data]
+            
+        return self.forward(list_of_data, softmax=softmax)
