@@ -12,14 +12,16 @@ filterwarnings("once")
 class ScOPEOT(BaseModel):
 
 
-    def __init__(self, use_matching_method: bool = False, matching_method: str = None) -> None:
+    def __init__(self, use_matching_method: bool = False, matching_method_name: str = None) -> None:
         self._is_matching_method: bool = use_matching_method
         self.epsilon: float = 1e-12
         
         if use_matching_method:
-            if matching_method is None:
-                self.matching_method_name = 'dice'
-                warn(f"No matching method provided. Using default: {self.matching_method_name}")
+            if matching_method_name is None:
+                matching_method_name = 'dice'
+                warn(f"No matching method provided. Using default: {matching_method_name}")
+                
+            self.matching_method_name: str = matching_method_name
             self.matching_method: MatchingMethods = MatchingMethods()
 
         else:
