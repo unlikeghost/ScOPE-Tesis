@@ -1,9 +1,13 @@
+import os
+import pickle
+import warnings
 import numpy as np
+from datetime import datetime
 from sklearn.metrics import (roc_curve, roc_auc_score, accuracy_score,
                              confusion_matrix, f1_score, log_loss)
 
 
-def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarray) -> dict:
+def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_proba: np.ndarray, save_path: str = None) -> dict:
     """
     Generates a comprehensive performance report for results, including 
     ROC-related metrics, F1 scores, log loss, and confusion matrix evaluation.
@@ -18,7 +22,7 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarr
             True binary class labels of the dataset (0 or 1).
         y_pred: np.ndarray
             Predicted binary class labels by a classifier (0 or 1).
-        y_pred_softmax: np.ndarray
+        y_pred_proba: np.ndarray
             Predicted probabilities for each class [prob_class_0, prob_class_1], 
             used for generating the ROC curve and calculating log loss.
 
@@ -35,11 +39,11 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarr
             - 'confusion_matrix': confusion matrix of true vs predicted class labels.
     """
     
-    y_pred_softmax_array = np.array(y_pred_softmax)
+    y_pred_proba_array = np.array(y_pred_proba)
     
     try:
-        fpr, tpr, thresholds = roc_curve(y_true, y_pred_softmax_array[:, 1])
-        auc_roc = roc_auc_score(y_true, y_pred_softmax_array[:, 1])
+        fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba_array[:, 1])
+        auc_roc = roc_auc_score(y_true, y_pred_proba_array[:, 1])
     except Exception as e:
         print(f"Warning: Error calculando ROC/AUC: {e}")
         fpr, tpr, thresholds = None, None, None
@@ -58,7 +62,7 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarr
         f1 = 0.0
     
     try:
-        logloss = log_loss(y_true, y_pred_softmax_array)
+        logloss = log_loss(y_true, y_pred_proba_array)
     except Exception as e:
         print(f"Warning: Error calculando log loss: {e}")
         logloss = 1.0
@@ -79,5 +83,19 @@ def make_report(y_true: np.ndarray, y_pred: np.ndarray, y_pred_softmax: np.ndarr
         'log_loss': logloss,
         'confusion_matrix': conf_matrix
     }
+    
+    if save_path:
+        try:
+            os.makedirs(save_path, exist_ok=True)
+            filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pkl"
+            filepath = os.path.join(save_path, filename)
+        
+            with open(filepath, 'wb') as f:
+                pickle.dump(this_data, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+            print(f"Report saved to {filepath}")
+        
+        except Exception as e:
+            warnings.warn(f"Failed to save report to {save_path}: {e}")
 
     return this_data

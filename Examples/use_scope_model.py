@@ -1,21 +1,22 @@
 from scope import ScOPE
 
+print("holi")
 model =  ScOPE(
     compressor_name="gzip",
     compression_distance_function='ncd',
     use_best_sigma=True,
     string_separator=' ',
-    get_softmax=True,
+    use_softmax=True,
     
     model_type="ot",
     use_matching_method=True,
     matching_method_name="dice"
 )
 
-sample= ["hola"]
+sample= ["holi"]
 
 kw_samples = {
-    "sample_1": ["hola", "holi"],
+    "sample_1": ["holi", "hola"],
     "sample_2": ["adios", "adiosito"]
 }
     
@@ -28,7 +29,6 @@ for distance in ["cosine", "euclidean", "manhattan", "chebyshev", "canberra", "m
         compression_distance_function='ncd',
         use_best_sigma=True,
         string_separator=' ',
-        get_softmax=True,
         
         model_type="pd",
         distance_metric=distance,
@@ -36,3 +36,6 @@ for distance in ["cosine", "euclidean", "manhattan", "chebyshev", "canberra", "m
     )
 
     print(list(model(sample, kw_samples)))
+    break
+
+

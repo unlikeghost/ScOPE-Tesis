@@ -4,8 +4,7 @@ from scope.models.base_model import BaseModel
 
 class ScOPEPD(BaseModel):
 
-    def __init__(self, distance_metric: str = "cosine", use_prototypes: bool = False) -> None:
-        self.epsilon: float = 1e-12
+    def __init__(self, distance_metric: str = "cosine", use_prototypes: bool = False, use_softmax: bool = False, epsilon: float = 1e-8) -> None:
         self.use_prototypes = use_prototypes
 
         self.supported_distance_metrics = {
@@ -24,6 +23,8 @@ class ScOPEPD(BaseModel):
         if distance_metric not in self.supported_distance_metrics:
             raise ValueError(f"Unsupported distance metric: {distance_metric}")
         self.distance_metric = self.supported_distance_metrics[distance_metric]
+
+        super().__init__(use_softmax=use_softmax, epsilon=epsilon)
 
     @staticmethod
     def __calc_prototype__(data: np.ndarray) -> np.ndarray:

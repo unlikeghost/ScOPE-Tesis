@@ -12,9 +12,8 @@ filterwarnings("once")
 class ScOPEOT(BaseModel):
 
 
-    def __init__(self, use_matching_method: bool = False, matching_method_name: str = None) -> None:
+    def __init__(self, use_matching_method: bool = False, matching_method_name: str = None, use_softmax: bool = False, epsilon: float = 1e-8) -> None:
         self._is_matching_method: bool = use_matching_method
-        self.epsilon: float = 1e-12
         
         if use_matching_method:
             if matching_method_name is None:
@@ -27,6 +26,7 @@ class ScOPEOT(BaseModel):
         else:
             warn("Using OT method, matching method will be ignored.")
 
+        super().__init__(use_softmax=use_softmax, epsilon=epsilon)
 
     def __matching_score__(self, x1: np.ndarray, x2: np.ndarray) -> float:
         if not self._is_matching_method:

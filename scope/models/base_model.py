@@ -8,6 +8,10 @@ from abc import abstractmethod, ABC
 class BaseModel(ABC):
     start_key_value_matrix: str = 'ScOPEC_'
     start_key_value_sample: str = 'ScOPES_'
+    
+    def __init__(self, use_softmax: bool = False, epsilon: float = 1e-8):
+        self.use_softmax = use_softmax
+        self.epsilon = epsilon
 
     @staticmethod
     def __softmax__(scores: np.ndarray) -> np.ndarray:
@@ -22,13 +26,13 @@ class BaseModel(ABC):
                 (x / sigma)
             )
         )
-
+    
     @abstractmethod
     def __forward__(self, current_cluster: np.ndarray, current_sample: np.ndarray) -> float:
         raise NotImplementedError("This method should be implemented in subclasses.")
     
     
-    def forward(self, list_of_data: List[Dict[str, np.ndarray]], softmax: bool = False) -> List[Dict[str, Any]]:
+    def forward(self, list_of_data: List[Dict[str, np.ndarray]]) -> List[Dict[str, Any]]:
 
         if not isinstance(list_of_data, list):
             raise ValueError("Input should be a list of dictionaries containing data matrices.")
@@ -90,7 +94,7 @@ class BaseModel(ABC):
                 
                 this_output['scores'][real_cluster_name] = score
 
-            if softmax:
+            if self.use_softmax:
                 score_values: list = list(this_output['scores'].values())
                 # compute reciprocal distances:
                 similarity_scores = 1 / (np.array(score_values) + self.epsilon)
@@ -110,7 +114,7 @@ class BaseModel(ABC):
             
         return output
 
-    def __call__(self, list_of_data: Union[List[Dict[str, np.ndarray]], Dict[str, np.ndarray]], softmax: bool = False) -> List[Dict[str, Any]]:
+    def __call__(self, list_of_data: Union[List[Dict[str, np.ndarray]], Dict[str, np.ndarray]]) -> List[Dict[str, Any]]:
 
         if not list_of_data:
             return []
@@ -118,4 +122,4 @@ class BaseModel(ABC):
         if isinstance(list_of_data, dict):
             list_of_data = [list_of_data]
             
-        return self.forward(list_of_data, softmax=softmax)
+        return self.forward(list_of_data)

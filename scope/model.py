@@ -13,7 +13,7 @@ class ScOPE:
                  use_best_sigma: bool = True,
                  string_separator: str = ' ',
                  model_type: str = "ot",
-                 get_softmax: bool = True,
+                 use_softmax: bool = True,
                  **model_kwargs) -> None:
                 
         _compressor = get_compressor(compressor_name)
@@ -23,12 +23,10 @@ class ScOPE:
             str_separator=string_separator
         )
         
-        self.model = ModelRegistry.create(model_type, **model_kwargs)
+        self.model = ModelRegistry.create(model_type, use_softmax=use_softmax, **model_kwargs)
         self.use_best_sigma = use_best_sigma
         self.model_type = model_type
-        
-        self.get_softmax = get_softmax
-    
+            
     def __str__(self):
         return (f"ScOPE Model: {self.model_type}, "
                 f"Use Best Sigma: {self.use_best_sigma}, "
@@ -42,7 +40,7 @@ class ScOPE:
         
         matrix_result: dict = self.matrix_factory(sample, kw_samples, get_best_sigma=self.use_best_sigma)
         
-        predictions: dict = self.model(matrix_result, softmax=self.get_softmax)[0]
+        predictions: dict = self.model(matrix_result)[0]
         
         return predictions
 
