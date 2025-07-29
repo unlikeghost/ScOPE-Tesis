@@ -53,7 +53,7 @@ class ScOPEOT(_BasePredictor):
                                  cost_matrix: np.ndarray) -> float:
         return ot.emd2(cluster_weights, sample_weights, cost_matrix)
     
-    def __forward__(self, current_cluster: np.ndarray, current_sample: np.ndarray) -> np.ndarray:
+    def __forward__(self, current_cluster: np.ndarray, current_sample: np.ndarray) -> float:
 
         cost_matrix: np.ndarray = self.__calc_cost_matrix__(sample=current_sample, kw_samples=current_cluster)
         
