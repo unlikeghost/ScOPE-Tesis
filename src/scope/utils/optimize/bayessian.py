@@ -58,9 +58,9 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                 'compression_metric',
                 self.parameter_space.compression_metrics
             ),
-            'str_separator': trial.suggest_categorical(
-                'str_separator', 
-                self.parameter_space.str_separators
+            'string_separator': trial.suggest_categorical(
+                'string_separator', 
+                self.parameter_space.string_separators
             ),
             'model_type': trial.suggest_categorical(
                 'model_type',
@@ -182,7 +182,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         print(f"  • Compression metrics ({len(self.parameter_space.compression_metrics)}): {self.parameter_space.compression_metrics}")
         print(f"  • Compression levels ({len(self.parameter_space.compression_levels)}): {self.parameter_space.compression_levels}") 
         print(f"  • Min size thresholds ({len(self.parameter_space.min_size_thresholds)}): {self.parameter_space.min_size_thresholds}")
-        print(f"  • String separators ({len(self.parameter_space.str_separators)}): {[repr(s) for s in self.parameter_space.str_separators]}")
+        print(f"  • String separators ({len(self.parameter_space.string_separators)}): {[repr(s) for s in self.parameter_space.string_separators]}")
         print(f"  • Use best sigma: {self.parameter_space.use_best_sigma_options}")
         print(f"  • Model types: {self.parameter_space.model_types}")
         
@@ -203,7 +203,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                        len(self.parameter_space.compression_metrics) * 
                        len(self.parameter_space.compression_levels) * 
                        len(self.parameter_space.min_size_thresholds) *  
-                       len(self.parameter_space.str_separators) * 
+                       len(self.parameter_space.string_separators) * 
                        len(self.parameter_space.use_best_sigma_options)
                        )
         
@@ -273,7 +273,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         print(f"Best score: {self.study.best_value:.4f}")
         print("Best parameters:")
         for param, value in self.best_params.items():
-            if param == 'str_separator':
+            if param == 'string_separator':
                 value = repr(value)
             print(f"  {param}: {value}")
         
@@ -435,7 +435,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             f.write(f"  Compression metrics ({len(self.parameter_space.compression_metrics)}): {self.parameter_space.compression_metrics}\n")
             f.write(f"  Compression levels ({len(self.parameter_space.compression_levels)}): {self.parameter_space.compression_levels}\n")
             f.write(f"  Min size thresholds ({len(self.parameter_space.min_size_thresholds)}): {self.parameter_space.min_size_thresholds}\n")
-            f.write(f"  String separators ({len(self.parameter_space.str_separators)}): {self.parameter_space.str_separators}\n")
+            f.write(f"  String separators ({len(self.parameter_space.string_separators)}): {self.parameter_space.string_separators}\n")
             f.write(f"  Use best sigma options: {self.parameter_space.use_best_sigma_options}\n")
             f.write(f"  Model types: {self.parameter_space.model_types}\n\n")
             
@@ -463,7 +463,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             f.write("BEST CONFIGURATION:\n")
             f.write("-" * 30 + "\n")
             for param, value in self.best_params.items():
-                if param == 'str_separator':
+                if param == 'string_separator':
                     value = repr(value)
                 f.write(f"{param}: {value}\n")
             f.write("\n")
@@ -533,7 +533,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                     for param_col in param_cols:
                         param_name = param_col.replace('params_', '')
                         param_value = row[param_col]
-                        if param_name == 'str_separator':
+                        if param_name == 'string_separator':
                             param_value = repr(param_value)
                         elif pd.isna(param_value):
                             param_value = 'None'
@@ -573,7 +573,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         # Select relevant columns
         important_cols = ['number', 'value', 'state']
         basic_param_cols = ['compressor_name', 'compression_metric', 'compression_level', 
-                           'min_size_threshold', 'str_separator', 'use_best_sigma', 'model_type']
+                           'min_size_threshold', 'string_separator', 'use_best_sigma', 'model_type']
         model_specific_cols = []
         
         # Find model-specific columns

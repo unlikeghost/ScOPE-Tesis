@@ -28,7 +28,7 @@ class ParameterSpace:
         default_factory=lambda: [metric.value for metric in MetricType]
     )
     
-    str_separators: List[str] = field(
+    string_separators: List[str] = field(
         default_factory=lambda: [' ', '\t', '\n', '|', ',']
     )
     
@@ -85,7 +85,7 @@ class ScOPEOptimizer(ABC):
             'compression_level': params['compression_level'],
             'min_size_threshold': params['min_size_threshold'],
             'use_best_sigma': params['use_best_sigma'],
-            'string_separator': params['str_separator'],
+            'string_separator': params['string_separator'],
             'model_type': params['model_type'],
             'use_softmax': True
         }

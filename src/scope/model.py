@@ -31,8 +31,15 @@ class ScOPE:
             **model_kwargs
         )
         
+        self._compressor_name = compressor_name
+        self._compression_metric = compression_metric
+        self._compression_level = compression_level
+        self._min_size_threshold = min_size_threshold
+        self._string_separator = string_separator
         self._using_sigma = use_best_sigma
         self._use_softmax = use_softmax
+        self._model_type = model_type
+        self._model_kwargs = model_kwargs
     
     def __forward__(self, sample: str, kw_samples: Dict[str, str]) -> Dict[str, Any]:
         
@@ -74,3 +81,16 @@ class ScOPE:
             list_kw_samples=list_kw_samples,
             list_samples=list_samples
         )
+    
+    def __str__(self):
+        return (f"ScOPE(compressor='{self._compressor_name}', "
+                f"metric='{self._compression_metric}', "
+                f"level={self._compression_level}, "
+                f"min_size={self._min_size_threshold}, "
+                f"use_sigma={self._using_sigma}, "
+                f"softmax={self._use_softmax}, "
+                f"model='{self._model_type}',"
+                f"model_args='{self._model_kwargs}')")
+
+    def __repr__(self):
+        return self.__str__()
