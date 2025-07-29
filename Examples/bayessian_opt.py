@@ -28,7 +28,7 @@ kw_samples_validation = [
 
 
 optimizer = ScOPEOptimizerBayesian(
-    n_trials=20,
+    n_trials=10,
     timeout=100,
     target_metric='auc_roc',
     study_name="test_optimization"
@@ -38,4 +38,4 @@ study = optimizer.optimize(x_validation, y_validation, kw_samples_validation)
 
 best_model = optimizer.get_best_model()
 
-optimizer.save_complete_analysis(top_n=500)
+optimizer.save_complete_analysis(top_n=10)
