@@ -135,7 +135,6 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             try:
                 # Use the suggest_all_params method from parent class
                 params = self.suggest_all_params(trial)
-                
                 # Create model with suggested configuration
                 model = self.create_model_from_params(params)
                 
@@ -260,9 +259,16 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             study_name=self.study_name
         )
         
+        n_jobs = max(1, os.cpu_count() - 3)
+
         # Execute optimization
         print("\nStarting optimization...")
-        self.study.optimize(objective_func, n_trials=self.n_trials, timeout=self.timeout)
+        self.study.optimize(
+            objective_func,
+            n_trials=self.n_trials,
+            timeout=self.timeout,
+            n_jobs=n_jobs
+        )
         
         # Store best results
         self.best_params = self.study.best_params

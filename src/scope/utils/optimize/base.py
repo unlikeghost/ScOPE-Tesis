@@ -38,11 +38,11 @@ class ParameterSpace:
 
     # Integer parameters
     compression_levels: List[int] = field(
-        default_factory=lambda: [1, 3, 6, 9]  # Rango típico de compresión
+        default_factory=lambda: [1, 3, 6, 9]
     )
     
     min_size_thresholds: List[int] = field(
-        default_factory=lambda: [0, 10, 50, 100]  # Umbrales de tamaño mínimo
+        default_factory=lambda: [0, 10, 50, 100]
     )
 
     # Boolean parameters

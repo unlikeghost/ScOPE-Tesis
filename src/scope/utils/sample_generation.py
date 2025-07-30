@@ -84,7 +84,7 @@ class SampleGenerator:
             sample_to_predict: np.ndarray = self.data[index]
 
             current_kw_samples: Dict[str, np.ndarray] = {
-                f'class_{cls}': np.zeros((num_samples, self.data.shape[1]))
+                f'class_{cls}': np.zeros((num_samples, len(self.data)))
                 for cls in self.unique_classes
             }
 

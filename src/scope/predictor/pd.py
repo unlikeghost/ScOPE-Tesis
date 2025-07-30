@@ -4,7 +4,7 @@ from scope.predictor.base import _BasePredictor
 
 class ScOPEPD(_BasePredictor):
 
-    def __init__(self, distance_metric: str = "cosine", use_prototypes: bool = False, use_softmax: bool = False, epsilon: float = 1e-8) -> None:
+    def __init__(self, distance_metric: str = "cosine", use_prototypes: bool = False, use_softmax: bool = False, epsilon: float = 1e-12) -> None:
         self.use_prototypes = use_prototypes
 
         self.supported_distance_metrics = {

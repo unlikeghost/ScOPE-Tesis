@@ -12,7 +12,7 @@ filterwarnings("once")
 class ScOPEOT(_BasePredictor):
 
 
-    def __init__(self, use_matching_method: bool = False, matching_method_name: str = None, use_softmax: bool = False, epsilon: float = 1e-8) -> None:
+    def __init__(self, use_matching_method: bool = False, matching_method_name: str = None, use_softmax: bool = False, epsilon: float = 1e-12) -> None:
         self._is_matching_method: bool = use_matching_method
         
         if use_matching_method:

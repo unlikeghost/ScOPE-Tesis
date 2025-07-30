@@ -16,7 +16,7 @@ class PredictorRegistry:
         cls._defaults[name] = defaults or {}
     
     @classmethod
-    def create(cls, name: str, use_softmax: bool = True, epsilon: float = 1e-8, **kwargs) -> _BasePredictor:
+    def create(cls, name: str, use_softmax: bool = True, epsilon: float = 1e-12, **kwargs) -> _BasePredictor:
         if name not in cls._predictors:
             available = list(cls._predictors.keys())
             raise ValueError(f"Model '{name}' not found. Available: {available}")

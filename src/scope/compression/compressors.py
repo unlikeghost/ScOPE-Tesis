@@ -18,7 +18,7 @@ class CompressorType(Enum):
     BZ2 = "bz2"
     GZIP = "gzip"
     LZ4 = "lz4"
-    LZMA = "lzma"
+    # LZMA = "lzma"
     ZLIB = "zlib"
     ZSTD = "zstd"
     
@@ -207,7 +207,7 @@ COMPRESSOR_STRATEGIES = {
     CompressorType.BZ2: Bz2,
     CompressorType.GZIP: Gzip,
     CompressorType.LZ4: Lz4,
-    CompressorType.LZMA: Lzma,
+    # CompressorType.LZMA: Lzma,
     CompressorType.ZLIB: Zlib,
     CompressorType.ZSTD: ZStandard
 }
