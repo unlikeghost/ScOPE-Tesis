@@ -20,6 +20,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
     
     def __init__(self, 
                  parameter_space: Optional[ParameterSpace] = None,
+                 free_cpu: int = 0,
                  n_trials: int = 50,
                  timeout: int = 1800,
                  target_metric: str = 'auc_roc',
@@ -28,12 +29,11 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                  study_name: str = "scope_optimization",
                  output_path: str = "./results"):
         """Initialize the Bayesian optimizer"""
-        super().__init__(parameter_space)
+        super().__init__(parameter_space, free_cpu, random_seed=random_seed)
         
         self.n_trials = n_trials
         self.timeout = timeout
         self.target_metric = target_metric
-        self.random_seed = random_seed
         self.study_name = study_name
         self.output_path = output_path
         self.cv_folds = cv_folds
@@ -150,10 +150,9 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                 # Calculate target metric
                 if self.target_metric == 'combined':
                     final_score = (
-                        scores['accuracy'] * 0.25 +
                         scores['f1_score'] * 0.35 +
                         scores['auc_roc'] * 0.35 +
-                        (1 - scores['log_loss']) * 0.05
+                        (1 - scores['log_loss']) * 0.10
                     )
                 elif self.target_metric == 'log_loss':
                     final_score = -scores['log_loss']  # Minimize log_loss
@@ -254,20 +253,18 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             ),
             pruner=MedianPruner(
                 n_startup_trials=5,
-                n_warmup_steps=1
+                n_warmup_steps=2
             ),
             study_name=self.study_name
         )
         
-        n_jobs = max(1, os.cpu_count() - 3)
-
         # Execute optimization
         print("\nStarting optimization...")
         self.study.optimize(
             objective_func,
             n_trials=self.n_trials,
             timeout=self.timeout,
-            n_jobs=n_jobs
+            n_jobs=self.n_jobs
         )
         
         # Store best results

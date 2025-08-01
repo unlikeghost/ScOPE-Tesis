@@ -1,3 +1,4 @@
+import os
 import warnings
 import numpy as np
 from typing import List, Dict, Optional, Any
@@ -38,7 +39,7 @@ class ParameterSpace:
 
     # Integer parameters
     compression_levels: List[int] = field(
-        default_factory=lambda: [1, 3, 6, 9]
+        default_factory=lambda: [3, 6, 7, 8, 9]
     )
     
     min_size_thresholds: List[int] = field(
@@ -72,8 +73,12 @@ class ParameterSpace:
 class ScOPEOptimizer(ABC):
     """Abstract base class for ScOPE model optimizers."""
 
-    def __init__(self, parameter_space: Optional[ParameterSpace] = None):
+    def __init__(self, parameter_space: Optional[ParameterSpace] = None, free_cpu: int = 0, random_seed: int =  42):
         self.parameter_space = parameter_space or ParameterSpace()
+        
+        self.n_jobs = max(1, os.cpu_count() - free_cpu)
+        
+        self.random_seed: int = random_seed
     
     def create_model_from_params(self, params: Dict[str, Any]) -> ScOPE:
         """Create a ScOPE model instance from the given parameters."""
@@ -154,7 +159,7 @@ class ScOPEOptimizer(ABC):
         """Evaluate the model using cross-validation."""
         
         indices = np.arange(len(X_samples))
-        skf = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=42)
+        skf = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=self.random_seed)
         
         cv_scores = {
             'accuracy': [],

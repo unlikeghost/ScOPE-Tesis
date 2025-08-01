@@ -163,13 +163,14 @@ class Lzma(_BaseCompressor):
     def compress(self, sequence: bytes) -> bytes:
         return lzma.compress(
             sequence,
-            format=lzma.FORMAT_RAW,
-            filters=[
-                {
-                    "id": lzma.FILTER_LZMA2,
-                    "preset": self._compression_level
-                }
-            ]
+            # format=lzma.FORMAT_RAW,
+            preset=self._compression_level
+            # filters=[
+            #     {
+            #         "id": lzma.FILTER_LZMA2,
+            #         "preset": self._compression_level
+            #     }
+            # ]
         )
         
         

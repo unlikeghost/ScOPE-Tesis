@@ -77,11 +77,11 @@ class _BasePredictor(ABC):
                 current_cluster: np.ndarray = data_matrix[cluster_key]
                 current_sample: np.ndarray = data_matrix[current_sample_key]
                 
-                # if np.allclose(current_sample, 0, atol=self.epsilon):
-                current_sample = current_sample + np.random.normal(0, self.epsilon, current_sample.shape)
+                if np.allclose(current_sample, 0, atol=self.epsilon):
+                    current_sample = current_sample + np.random.normal(0, self.epsilon, current_sample.shape)
                 
-                # if np.allclose(current_cluster, 0, atol=self.epsilon):
-                current_cluster = current_cluster + np.random.normal(0, self.epsilon, current_cluster.shape)
+                if np.allclose(current_cluster, 0, atol=self.epsilon):
+                    current_cluster = current_cluster + np.random.normal(0, self.epsilon, current_cluster.shape)
 
                 if data_matrix.get("best_sigma"):
                     current_cluster = self.__gaussian_function__(
