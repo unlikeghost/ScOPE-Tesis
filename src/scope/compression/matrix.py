@@ -15,6 +15,7 @@ class _BaseMatrixFactory(ABC):
                  concat_value: str = " ",
                  compressor_name: str = "gzip",
                  compression_level: int = 9,
+                 symetric: bool = False,
                  min_size_threshold: int = 0):
         
         if not isinstance(concat_value, str):
@@ -31,6 +32,8 @@ class _BaseMatrixFactory(ABC):
         )
         
         self._compression_metric_name = compression_metric
+        
+        self._is_symetric: bool = symetric
         
     def __str__(self) -> str:
         return (
@@ -88,8 +91,12 @@ class _BaseMatrixFactory(ABC):
 
 class CompressionMatrixFactory(_BaseMatrixFactory):
     
-    def __init__(self, compression_metric = "ncd", concat_value = " ", compressor_name = "gzip", compression_level = 9, min_size_threshold = 0):
-        super().__init__(compression_metric, concat_value, compressor_name, compression_level, min_size_threshold)
+    def __init__(self, compression_metric = "ncd", concat_value = " ",
+                 compressor_name = "gzip", compression_level = 9,
+                 min_size_threshold = 0, symetric: bool = False):
+        super().__init__(compression_metric, concat_value,
+                         compressor_name, compression_level,
+                         min_size_threshold, symetric=symetric)
     
     def compute_compression_matrix(self, samples: List[str]) -> np.ndarray:
         sample_count = len(samples)
@@ -101,25 +108,26 @@ class CompressionMatrixFactory(_BaseMatrixFactory):
                 
                 x1: str = samples[i]
                 x2: str = samples[j]
-                                
+                
                 x1x2_distance_value: float = self._compresion_metric.compute(
-                    x1=x1,
-                    x2=x2,
-                    concat_str=self._concat_value
-                )
-                
-                x2x1_distance_value: float = self._compresion_metric.compute(
-                    x1=x2,
-                    x2=x1,
-                    concat_str=self._concat_value
-                )
+                        x1=x1,
+                        x2=x2,
+                        concat_str=self._concat_value
+                    )
+                                    
+                if self._is_symetric:
+                    distance_matrix[i, j] = distance_matrix[j, i] = x1x2_distance_value
+                    
+                else:
+                    x2x1_distance_value: float = self._compresion_metric.compute(
+                        x1=x2,
+                        x2=x1,
+                        concat_str=self._concat_value
+                    )
 
-                distance_matrix[i, j] = x1x2_distance_value
-                distance_matrix[j, i] = x2x1_distance_value
-                
-                # Before i used to ave hit but not all metrics are symmetric!
-                # distance_matrix[i, j] = distance_matrix[j, i] = distance
-                        
+                    distance_matrix[i, j] = x1x2_distance_value
+                    distance_matrix[j, i] = x2x1_distance_value
+                    
         return distance_matrix
                 
     def build_matrix(self,  

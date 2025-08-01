@@ -39,15 +39,19 @@ class ParameterSpace:
 
     # Integer parameters
     compression_levels: List[int] = field(
-        default_factory=lambda: [3, 6, 7, 8, 9]
+        default_factory=lambda: [1, 3, 6, 9]
     )
     
     min_size_thresholds: List[int] = field(
-        default_factory=lambda: [0, 10, 50, 100]
+        default_factory=lambda: [0, 10, 50]
     )
 
     # Boolean parameters
     use_best_sigma_options: List[bool] = field(
+        default_factory=lambda: [True, False]
+    )
+    
+    symetric_matrix_options: List[bool] = field(
         default_factory=lambda: [True, False]
     )
 
@@ -57,12 +61,12 @@ class ParameterSpace:
     )
     
     ot_matching_method_names: List[str] = field(
-        default_factory=lambda: [matching.value for matching in MatchingType if matching.value is not None]
+        default_factory=lambda: [matching.value for matching in MatchingType]
     )
     
     # Parameters specific to ScOPEPD
     pd_distance_metrics: List[str] = field(
-        default_factory=lambda: ["cosine", "euclidean", "manhattan", "chebyshev", "canberra", "minkowski", "braycurtis", "hamming", "correlation", "dot_product"]
+        default_factory=lambda: ["cosine", "euclidean", "manhattan", "minkowski","dot_product"]
     )
     
     pd_use_prototypes_options: List[bool] = field(
@@ -90,6 +94,7 @@ class ScOPEOptimizer(ABC):
             'compression_level': params['compression_level'],
             'min_size_threshold': params['min_size_threshold'],
             'use_best_sigma': params['use_best_sigma'],
+            'symetric_matrix': params['symetric_matrix'],
             'string_separator': params['string_separator'],
             'model_type': params['model_type'],
             'use_softmax': True
@@ -162,7 +167,6 @@ class ScOPEOptimizer(ABC):
         skf = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=self.random_seed)
         
         cv_scores = {
-            'accuracy': [],
             'f1_score': [],
             'auc_roc': [],
             'log_loss': []
@@ -214,19 +218,16 @@ class ScOPEOptimizer(ABC):
                     try:
                         report = make_report(y_val_numeric, y_pred_numeric, y_pred_proba_array)
                         
-                        cv_scores['accuracy'].append(report['acc'])
                         cv_scores['f1_score'].append(report['f1_score'])
                         cv_scores['auc_roc'].append(report['auc_roc'])
                         cv_scores['log_loss'].append(report['log_loss'])
                         
                     except Exception as e:
                         print(f"Error en make_report: {e}")
-                        cv_scores['accuracy'].append(0.0)
                         cv_scores['f1_score'].append(0.0)
                         cv_scores['auc_roc'].append(0.5)
                         cv_scores['log_loss'].append(1.0)
                 else:
-                    cv_scores['accuracy'].append(0.0)
                     cv_scores['f1_score'].append(0.0)
                     cv_scores['auc_roc'].append(0.5)
                     cv_scores['log_loss'].append(1.0)
@@ -234,7 +235,6 @@ class ScOPEOptimizer(ABC):
         except Exception as e:
             print(f"Error en evaluación: {e}")
             return {
-                'accuracy': 0.0,
                 'f1_score': 0.0,
                 'auc_roc': 0.5,
                 'log_loss': 1.0

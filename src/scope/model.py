@@ -14,6 +14,7 @@ class ScOPE:
                  use_best_sigma: bool = True,
                  string_separator: str = ' ',
                  use_softmax: bool = True,
+                 symetric_matrix: bool= False,
                  model_type: str = "ot",
                  **model_kwargs) -> None:
         
@@ -22,7 +23,8 @@ class ScOPE:
             compressor_name=compressor_name,
             compression_level=compression_level,
             min_size_threshold=min_size_threshold,
-            concat_value=string_separator
+            concat_value=string_separator,
+            symetric=symetric_matrix,
         )
         
         self.predictor = PredictorRegistry.create(
@@ -31,6 +33,7 @@ class ScOPE:
             **model_kwargs
         )
         
+        self._symetric_matrix = symetric_matrix
         self._compressor_name = compressor_name
         self._compression_metric = compression_metric
         self._compression_level = compression_level
@@ -84,6 +87,7 @@ class ScOPE:
     
     def __str__(self):
         return (f"ScOPE(compressor='{self._compressor_name}', "
+                f"Symetric Matrix = '{self._symetric_matrix}', "
                 f"metric='{self._compression_metric}', "
                 f"level={self._compression_level}, "
                 f"min_size={self._min_size_threshold}, "

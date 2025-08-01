@@ -74,6 +74,10 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             'use_best_sigma': trial.suggest_categorical(
                 'use_best_sigma', 
                 self.parameter_space.use_best_sigma_options
+            ),
+            'symetric_matrix': trial.suggest_categorical(
+                'symetric_matrix',
+                self.parameter_space.symetric_matrix_options
             )
         }
     
@@ -182,6 +186,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         print(f"  • Min size thresholds ({len(self.parameter_space.min_size_thresholds)}): {self.parameter_space.min_size_thresholds}")
         print(f"  • String separators ({len(self.parameter_space.string_separators)}): {[repr(s) for s in self.parameter_space.string_separators]}")
         print(f"  • Use best sigma: {self.parameter_space.use_best_sigma_options}")
+        print(f"  • Use symetric matrix: {self.parameter_space.symetric_matrix_options}")
         print(f"  • Model types: {self.parameter_space.model_types}")
         
         print("\nMODEL-SPECIFIC PARAMETERS:")
@@ -202,7 +207,8 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                        len(self.parameter_space.compression_levels) * 
                        len(self.parameter_space.min_size_thresholds) *  
                        len(self.parameter_space.string_separators) * 
-                       len(self.parameter_space.use_best_sigma_options)
+                       len(self.parameter_space.use_best_sigma_options) *
+                       len(self.parameter_space.symetric_matrix_options)
                        )
         
         total_ot = (len(self.parameter_space.ot_use_matching_method_options) * 
@@ -382,7 +388,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         if not df_results.empty:
             print("\nTop 5 configurations:")
             columns_to_show = ['value', 'params_compressor_name', 'params_compression_metric', 
-                              'params_use_best_sigma', 'params_model_type']
+                              'params_use_best_sigma', 'params_symetric_matrix' 'params_model_type']
             
             # Add model-specific columns if they exist
             model_specific_columns = []
@@ -440,6 +446,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             f.write(f"  Min size thresholds ({len(self.parameter_space.min_size_thresholds)}): {self.parameter_space.min_size_thresholds}\n")
             f.write(f"  String separators ({len(self.parameter_space.string_separators)}): {self.parameter_space.string_separators}\n")
             f.write(f"  Use best sigma options: {self.parameter_space.use_best_sigma_options}\n")
+            f.write(f"  Use symetric matrix options: {self.parameter_space.symetric_matrix_options}\n")
             f.write(f"  Model types: {self.parameter_space.model_types}\n\n")
             
             f.write("MODEL-SPECIFIC PARAMETERS:\n")
@@ -576,7 +583,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         # Select relevant columns
         important_cols = ['number', 'value', 'state']
         basic_param_cols = ['compressor_name', 'compression_metric', 'compression_level', 
-                           'min_size_threshold', 'string_separator', 'use_best_sigma', 'model_type']
+                           'min_size_threshold', 'string_separator', 'use_best_sigma', 'model_type', 'symetric_matrix']
         model_specific_cols = []
         
         # Find model-specific columns
