@@ -150,14 +150,14 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                     kw_samples_list=kw_samples_validation,
                     cv_folds=self.cv_folds
                 )
-                
                 # Calculate target metric
                 if self.target_metric == 'combined':
+                    normalized_log_loss = 1 / (1 + scores['log_loss'])
                     final_score = (
-                        scores['f1_score'] * 0.30 +
-                        scores['auc_roc'] * 0.30 +
-                        (1 - scores['log_loss']) * 0.20
-                    )
+                        scores['auc_roc'] * 0.50 +
+                        scores['f1_score'] * 0.40 +
+                        normalized_log_loss * 0.10
+                   )
                 elif self.target_metric == 'log_loss':
                     final_score = -scores['log_loss']  # Minimize log_loss
                 else:

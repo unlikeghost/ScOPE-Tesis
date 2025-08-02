@@ -19,7 +19,7 @@ plt.rcParams['figure.max_open_warning'] = 0
 np.random.seed(seed)
 
 STUDY_NAME: str = 'Clintox'
-TEST_SAMPLES:list = 3
+TEST_SAMPLES:list = 5
 TRIALS: int = 2500
 CVFOLDS: int = 5
 
