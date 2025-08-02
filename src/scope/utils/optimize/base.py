@@ -39,7 +39,7 @@ class ParameterSpace:
 
     # Integer parameters
     compression_levels: List[int] = field(
-        default_factory=lambda: [1, 3, 6, 9]
+        default_factory=lambda: [1, 2, 5, 7, 9]
     )
     
     min_size_thresholds: List[int] = field(

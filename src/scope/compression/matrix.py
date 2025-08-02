@@ -94,10 +94,12 @@ class CompressionMatrixFactory(_BaseMatrixFactory):
     def __init__(self, compression_metric = "ncd", concat_value = " ",
                  compressor_name = "gzip", compression_level = 9,
                  min_size_threshold = 0, symetric: bool = False):
+                
         super().__init__(compression_metric, concat_value,
-                         compressor_name, compression_level,
-                         min_size_threshold, symetric=symetric)
-    
+                        compressor_name, compression_level,
+                        symetric, min_size_threshold)
+        
+        
     def compute_compression_matrix(self, samples: List[str]) -> np.ndarray:
         sample_count = len(samples)
         

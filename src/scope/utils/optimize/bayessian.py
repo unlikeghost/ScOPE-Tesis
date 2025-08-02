@@ -154,9 +154,9 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
                 # Calculate target metric
                 if self.target_metric == 'combined':
                     final_score = (
-                        scores['f1_score'] * 0.35 +
-                        scores['auc_roc'] * 0.35 +
-                        (1 - scores['log_loss']) * 0.10
+                        scores['f1_score'] * 0.30 +
+                        scores['auc_roc'] * 0.30 +
+                        (1 - scores['log_loss']) * 0.20
                     )
                 elif self.target_metric == 'log_loss':
                     final_score = -scores['log_loss']  # Minimize log_loss

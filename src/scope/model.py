@@ -14,7 +14,7 @@ class ScOPE:
                  use_best_sigma: bool = True,
                  string_separator: str = ' ',
                  use_softmax: bool = True,
-                 symetric_matrix: bool= False,
+                 symetric_matrix: bool = False,
                  model_type: str = "ot",
                  **model_kwargs) -> None:
         
