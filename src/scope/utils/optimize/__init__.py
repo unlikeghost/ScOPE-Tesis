@@ -1,1 +1,1 @@
-from .bayessian import ScOPEOptimizerBayesian
+from .bayesian import ScOPEOptimizerBayesian

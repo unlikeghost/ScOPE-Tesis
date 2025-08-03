@@ -47,88 +47,6 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
         self.best_params = None
         self.best_model = None
     
-    def suggest_categorical_params(self, trial) -> Dict[str, Any]:
-        """Suggest categorical parameters"""
-        return {
-            'compressor_name': trial.suggest_categorical(
-                'compressor_name',
-                self.parameter_space.compressor_names
-            ),
-            'compression_metric': trial.suggest_categorical(
-                'compression_metric',
-                self.parameter_space.compression_metrics
-            ),
-            'string_separator': trial.suggest_categorical(
-                'string_separator', 
-                self.parameter_space.string_separators
-            ),
-            'model_type': trial.suggest_categorical(
-                'model_type',
-                self.parameter_space.model_types
-            )
-        }
-    
-    def suggest_boolean_params(self, trial) -> Dict[str, Any]:
-        """Suggest boolean parameters"""
-        return {
-            'use_best_sigma': trial.suggest_categorical(
-                'use_best_sigma', 
-                self.parameter_space.use_best_sigma_options
-            ),
-            'symetric_matrix': trial.suggest_categorical(
-                'symetric_matrix',
-                self.parameter_space.symetric_matrix_options
-            )
-        }
-    
-    def suggest_continuous_params(self, trial) -> Dict[str, Any]:
-        """Suggest continuous parameters"""
-        return {
-            'compression_level': trial.suggest_categorical(
-                'compression_level',
-                self.parameter_space.compression_levels
-            ),
-            'min_size_threshold': trial.suggest_categorical(
-                'min_size_threshold',
-                self.parameter_space.min_size_thresholds
-            )
-        }
-    
-    def suggest_model_specific_params(self, trial, model_type: str) -> Dict[str, Any]:
-        """Suggest model-specific parameters"""        
-        params = {}
-                
-        if model_type == "ot":
-            # Parámetros OT
-            params['ot_use_matching_method'] = trial.suggest_categorical(
-                'ot_use_matching_method',
-                self.parameter_space.ot_use_matching_method_options
-            )
-            
-            # Solo sugerir matching_method_name si use_matching_method es True
-            if params['ot_use_matching_method']:
-                available_ot_methods = self.parameter_space.ot_matching_method_names
-                if not available_ot_methods:
-                    available_ot_methods = ['matching']  # fallback
-                
-                params['ot_matching_method_name'] = trial.suggest_categorical(
-                    'ot_matching_method_name',
-                    available_ot_methods
-                )
-            
-        elif model_type == "pd":
-            # Parámetros PD
-            params['pd_distance_metric'] = trial.suggest_categorical(
-                'pd_distance_metric',
-                self.parameter_space.pd_distance_metrics
-            )
-            params['pd_use_prototypes'] = trial.suggest_categorical(
-                'pd_use_prototypes',
-                self.parameter_space.pd_use_prototypes_options
-            )
-        
-        return params
-    
     def _create_objective_function(self,
                                   X_validation: List[str],
                                   y_validation: List[str], 
@@ -173,55 +91,6 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
 
         return objective
 
-    def print_parameter_space(self):
-        """Print detailed parameter space information"""
-        print("Parameter space includes:")
-        print("=" * 60)
-        
-        # Basic parameters
-        print("BASIC PARAMETERS:")
-        print(f"  • Compressors ({len(self.parameter_space.compressor_names)}): {self.parameter_space.compressor_names}")
-        print(f"  • Compression metrics ({len(self.parameter_space.compression_metrics)}): {self.parameter_space.compression_metrics}")
-        print(f"  • Compression levels ({len(self.parameter_space.compression_levels)}): {self.parameter_space.compression_levels}") 
-        print(f"  • Min size thresholds ({len(self.parameter_space.min_size_thresholds)}): {self.parameter_space.min_size_thresholds}")
-        print(f"  • String separators ({len(self.parameter_space.string_separators)}): {[repr(s) for s in self.parameter_space.string_separators]}")
-        print(f"  • Use best sigma: {self.parameter_space.use_best_sigma_options}")
-        print(f"  • Use symetric matrix: {self.parameter_space.symetric_matrix_options}")
-        print(f"  • Model types: {self.parameter_space.model_types}")
-        
-        print("\nMODEL-SPECIFIC PARAMETERS:")
-        
-        # ScOPE-OT parameters
-        print("  ScOPE-OT:")
-        print(f"    • Use matching method: {self.parameter_space.ot_use_matching_method_options}")
-        print(f"    • Matching methods ({len(self.parameter_space.ot_matching_method_names)}): {self.parameter_space.ot_matching_method_names}")
-        
-        # ScOPE-PD parameters  
-        print("  ScOPE-PD:")
-        print(f"    • Distance metrics ({len(self.parameter_space.pd_distance_metrics)}): {self.parameter_space.pd_distance_metrics}")
-        print(f"    • Use prototypes: {self.parameter_space.pd_use_prototypes_options}")
-        
-        # Calculate total combinations
-        total_basic = (len(self.parameter_space.compressor_names) * 
-                       len(self.parameter_space.compression_metrics) * 
-                       len(self.parameter_space.compression_levels) * 
-                       len(self.parameter_space.min_size_thresholds) *  
-                       len(self.parameter_space.string_separators) * 
-                       len(self.parameter_space.use_best_sigma_options) *
-                       len(self.parameter_space.symetric_matrix_options)
-                       )
-        
-        total_ot = (len(self.parameter_space.ot_use_matching_method_options) * 
-                    max(1, len(self.parameter_space.ot_matching_method_names)))
-        
-        total_pd = (len(self.parameter_space.pd_distance_metrics) * 
-                    len(self.parameter_space.pd_use_prototypes_options))
-        
-        total_combinations = total_basic * (total_ot + total_pd)
-        
-        print(f"\nTOTAL POSSIBLE COMBINATIONS: ~{total_combinations:,}")
-        print("=" * 60)
-    
     def optimize(self,
                 X_validation: List[str],
                 y_validation: List[str],
@@ -259,7 +128,7 @@ class ScOPEOptimizerBayesian(ScOPEOptimizer):
             ),
             pruner=MedianPruner(
                 n_startup_trials=5,
-                n_warmup_steps=2
+                n_warmup_steps=1
             ),
             study_name=self.study_name
         )

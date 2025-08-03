@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import deepchem as dc
 from sklearn.model_selection import train_test_split
 
-from scope.utils import ScOPEOptimizerBayesian
 from scope.utils.report_generation import make_report
 from scope.utils.sample_generation import SampleGenerator
+from scope.utils.optimize.bayesian import optimize_scope_bayesian
 
+from scope.utils.optimize.params import OptimizationDirection, ObjectiveConfig
 
 seed: int = 42
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -18,10 +19,13 @@ warnings.filterwarnings('ignore', category=FutureWarning)
 plt.rcParams['figure.max_open_warning'] = 0
 np.random.seed(seed)
 
+
 STUDY_NAME: str = 'Clintox'
 TEST_SAMPLES:list = 3
-TRIALS: int = 2500
+TRIALS: int = 3000
 CVFOLDS: int = 5
+TIMEOUT: int = 1800
+
 
 RESULTS_PATH: str = os.path.join('results')
 ANALYSYS_RESULTS_PATH: str = os.path.join(RESULTS_PATH, str(TEST_SAMPLES), 'Optimization')
@@ -31,6 +35,12 @@ SMILES_COLUMN: str = 'smiles'
 LABEL_COLUMN: str = 'fda_approved'
 
 
+# OBJECTIVES = [
+#     ObjectiveConfig('auc_roc', OptimizationDirection.MAXIMIZE, weight=0.7),
+#     ObjectiveConfig('f1_score', OptimizationDirection.MAXIMIZE, weight=0.3),
+# ]
+
+OBJECTIVES = 'auc_roc'
 
 tasks, datasets, _ = dc.molnet.load_clintox(featurizer='Raw')
 train, valid, test = datasets
@@ -76,19 +86,6 @@ search_generator = SampleGenerator(
     seed=seed,
 )
 
-timeout: int = 1800
-
-optimizer = ScOPEOptimizerBayesian(
-    free_cpu=1,
-    n_trials=TRIALS,
-    random_seed=seed,
-    timeout=timeout,
-    target_metric='combined',
-    study_name=f'{STUDY_NAME}_Samples_{TEST_SAMPLES}',
-    output_path=ANALYSYS_RESULTS_PATH,
-    cv_folds=CVFOLDS
-)
-    
 all_x = []
 all_y = []
 all_kw = []
@@ -99,11 +96,25 @@ for x_search_i, y_search_i, search_kw_samples_i in search_generator.generate(num
     all_kw.append(search_kw_samples_i)
 
 
-study = optimizer.optimize(all_x, all_y, all_kw)
+study, optimizer = optimize_scope_bayesian(
+    X_validation=all_x,
+    y_validation=all_y,
+    kw_samples_validation=all_kw,
+    objectives=OBJECTIVES,
+    n_trials=TRIALS,
+    timeout=TIMEOUT,
+    random_seed=seed,
+    study_name=f'{STUDY_NAME}_Samples_{TEST_SAMPLES}',
+    output_path=ANALYSYS_RESULTS_PATH,
+    cv_folds=CVFOLDS,
+    use_cache=True
+)
+    
+
 
 optimizer.save_complete_analysis(top_n=1000)
 
-best_model = optimizer.get_best_model()
+best_model = optimizer.get_best_compromise_model()
 
 test_generator = SampleGenerator(
     data=x_test,
